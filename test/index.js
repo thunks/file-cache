@@ -5,5 +5,11 @@ var should = require('should'),
   FileCache = require('../index.js');
 
 describe('file-cache', function () {
-  it.skip('file-cache', function (done) {});
+  var fileCache = FileCache();
+  it('file-cache', function (done) {
+    fileCache('index.js')(function (err, file) {
+      console.log(err, file);
+    })(done);
+  });
+  // TODO
 });

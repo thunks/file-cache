@@ -1,14 +1,9 @@
-file-cache v0.1.0 [![Build Status](https://travis-ci.org/toajs/file-cache.svg)](https://travis-ci.org/toajs/file-cache)
-====
-A file buffer caching module that cache files on demand, rely on thunks.
-
-## [thunks](https://github.com/thunks/thunks)
-
-## Demo
-
-```js
 'use strict';
-var FileCache = require('file-cache');
+// **Github:** https://github.com/toajs/file-cache
+//
+// **License:** MIT
+
+var FileCache = require('../index');
 var fileCache = FileCache('./');
 
 fileCache('index.js')(function (err, file) {
@@ -48,58 +43,3 @@ fileCache('index.js')(function (err, file) {
     // md5: '33a6f550613d64dc6b7e1e2d99d568bd' }
   });
 });
-```
-
-## Installation
-
-```bash
-npm install file-cache
-```
-
-## API
-
-```js
-var FileCache = require('file-cache');
-var fileCache = FileCache('./static');
-```
-
-### FileCache(options)
-
-Return a read file function with cache.
-
-#### options
-
-*Optional*, Type: `String` or `Object`
-
-
-**options.root**
-
-*Optional*, Type: `String`, Default: `process.cwd()`.
-
-File directory, that allow to read file.
-
-**options.extraFiles**
-
-*Optional*, Type: `String` or `Array`, Default: `[]`.
-
-Extra files path, that allow to read.
-
-**options.compress**
-
-*Optional*, Type: `Boolean`, Default: `true`.
-
-Allow to compress file with `gzip` or `deflate`
-
-### fileCache(path, encodings)
-
-#### path
-
-*Required*, Type: `String`
-
-file path to read.
-
-#### encodings
-
-*Optional*, Type: `String` or `Array`
-
-Accept-Encoding, `['gzip', 'deflate']`
