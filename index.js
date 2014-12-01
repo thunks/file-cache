@@ -96,7 +96,7 @@ function File(originFile, compress) {
   this.mtime = originFile.mtime;
   this.ctime = originFile.ctime;
   this.birthtime = originFile.birthtime;
-  this.compress = compress;
+  this.compress = compress === 'origin' ? '' : compress;
   this.contents = new Buffer(content.length);
   this.length = content.length;
   this.md5 = content.md5;
@@ -131,8 +131,8 @@ function cloneFile(originFile, compress) {
       if (error) throw error;
       originFile[compress] = {
         contents: buf,
-        length: Buffer.byteLength(buf),
-        md5: crypto.createHash('md5').update(buf).digest('hex')
+        length: buf.length,
+        md5: crypto.createHash('md5').update(buf).digest('base64')
       };
       return new File(originFile, compress);
     })(callback);
