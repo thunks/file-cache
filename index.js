@@ -95,7 +95,6 @@ function File(originFile, compress) {
   this.atime = originFile.atime;
   this.mtime = originFile.mtime;
   this.ctime = originFile.ctime;
-  this.birthtime = originFile.birthtime;
   this.compress = compress === 'origin' ? '' : compress;
   this.contents = new Buffer(content.length);
   this.length = content.length;
@@ -114,7 +113,6 @@ function OriginFile(filePath, buf, stats, enableCompress) {
   this.atime = stats.atime.toUTCString();
   this.mtime = stats.mtime.toUTCString();
   this.ctime = stats.ctime.toUTCString();
-  this.birthtime = stats.birthtime.toUTCString();
   this.compressible = enableCompress && this.size > 1024  && compressible(this.type);
   this.contents = buf;
   this.origin = null;
