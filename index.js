@@ -3,14 +3,15 @@
 //
 // **License:** MIT
 
-var crypto = require('crypto');
 var fs = require('fs');
 var zlib = require('zlib');
 var path = require('path');
 var assert = require('assert');
+var crypto = require('crypto');
 
 var mime = require('mime-types');
 var compressible = require('compressible');
+var LRUCache = require('lrucache');
 var Thunk = require('thunks')();
 
 var stat = Thunk.thunkify.call(fs, fs.stat);
@@ -26,20 +27,28 @@ var compressFile = {
 module.exports = function (options) {
   var cache = Object.create(null);
   var extraFilesMap = Object.create(null);
+  var lruCache = new LRUCache();
+  var totalBytes = 0;
+  var cwd = process.cwd();
 
   options = options || {};
 
+  // for test.
+  if (options.debug) module.exports.cache = cache;
+
   if (typeof options === 'string') options = {root: options};
 
-  var root = typeof options.root === 'string' ? options.root : process.cwd();
-  root = path.resolve(process.cwd(), root);
+  var root = typeof options.root === 'string' ? options.root : cwd;
+  root = path.resolve(cwd, root);
 
   var extraFiles = options.extraFiles || [];
   if (!Array.isArray(extraFiles)) extraFiles = [extraFiles];
   for (var i = 0; i < extraFiles.length; i++)
-    extraFilesMap[extraFiles[i]] = path.resolve(root, extraFiles[i]);
+    extraFilesMap[extraFiles[i]] = path.resolve(cwd, extraFiles[i]);
 
   var enableCompress = options.compress !== false;
+  var maxCacheLength = options.maxCacheLength >= -1 ? Math.floor(options.maxCacheLength) : 0;
+  var md5Encoding = options.md5Encoding || 'base64';
 
   function resolvePath(filePath) {
     filePath = path.normalize(safeDecodeURIComponent(filePath));
@@ -49,16 +58,30 @@ module.exports = function (options) {
     throw new Error('Unauthorized file path');
   }
 
+  function checkLRU(filePath, addSize) {
+    if (maxCacheLength <= 0) return;
+
+    totalBytes += addSize;
+    lruCache.set(filePath, (lruCache.get(filePath) || 0) + addSize);
+
+    while (lruCache.staleKey() !== filePath && totalBytes >= maxCacheLength) {
+      var stale = lruCache.popStale();
+      cache[stale[0]] = null;
+      totalBytes -= stale[1];
+    }
+  }
+
   return function fileCache(filePath, encodings) {
     return Thunk(function (done) {
-      var compress = bestCompress(encodings);
+      var compressEncoding = bestCompress(encodings);
       filePath = resolvePath(filePath);
 
-      if (cache[filePath]) return cloneFile(cache[filePath], compress)(done);
+      if (cache[filePath]) return cloneFile(cache[filePath], compressEncoding, md5Encoding, checkLRU)(done);
       return Thunk.seq([stat(filePath), readFile(filePath)])(function (error, res) {
         if (error) throw error;
-        cache[filePath] = new OriginFile(filePath, res[1], res[0], enableCompress);
-        return cloneFile(cache[filePath], compress);
+        var originFile = new OriginFile(filePath, res[0], res[1], enableCompress);
+        if (maxCacheLength !== -1) cache[filePath] = originFile;
+        return cloneFile(originFile, compressEncoding, md5Encoding, checkLRU);
       })(done);
     });
   };
@@ -84,55 +107,56 @@ function safeDecodeURIComponent(path) {
   }
 }
 
-function File(originFile, compress) {
-  var content = originFile[compress];
-  this.path = originFile.path;
+function File(originFile, compressEncoding) {
+  var content = originFile[compressEncoding];
   this.dir = originFile.dir;
-  this.name = originFile.name;
   this.ext = originFile.ext;
-  this.type = originFile.type;
+  this.name = originFile.name;
+  this.path = originFile.path;
   this.size = originFile.size;
+  this.type = originFile.type;
   this.atime = originFile.atime;
   this.mtime = originFile.mtime;
   this.ctime = originFile.ctime;
-  this.compress = compress === 'origin' ? '' : compress;
+  this.compress = compressEncoding === 'origin' ? '' : compressEncoding;
   this.contents = new Buffer(content.length);
   this.length = content.length;
   this.md5 = content.md5;
   content.contents.copy(this.contents);
 }
 
-function OriginFile(filePath, buf, stats, enableCompress) {
+function OriginFile(filePath, stats, buf, enableCompress) {
   filePath = filePath.replace(/\\/g, '/');
-  this.path = filePath;
   this.dir = path.dirname(filePath);
-  this.name = path.basename(filePath);
   this.ext = path.extname(filePath);
-  this.type = this.mime = mime.lookup(filePath) || 'application/octet-stream';
+  this.name = path.basename(filePath);
+  this.path = filePath;
   this.size = stats.size;
+  this.type = mime.lookup(filePath) || 'application/octet-stream';
   this.atime = stats.atime.toUTCString();
   this.mtime = stats.mtime.toUTCString();
   this.ctime = stats.ctime.toUTCString();
-  this.compressible = enableCompress && this.size > 1024  && compressible(this.type);
+  this.compressible = enableCompress && this.size > 256  && compressible(this.type);
   this.contents = buf;
   this.origin = null;
   this.gzip = null;
   this.deflate = null;
 }
 
-function cloneFile(originFile, compress) {
-  if (!originFile.compressible) compress = 'origin';
+function cloneFile(originFile, compressEncoding, md5Encoding, checkLRU) {
+  if (!originFile.compressible) compressEncoding = 'origin';
 
-  return Thunk(function (callback) {
-    if (originFile[compress]) return callback(null, new File(originFile, compress));
-    return compressFile[compress](originFile.contents)(function (error, buf) {
+  return Thunk(function (done) {
+    if (originFile[compressEncoding]) return done(null, new File(originFile, compressEncoding));
+    return compressFile[compressEncoding](originFile.contents)(function (error, buf) {
       if (error) throw error;
-      originFile[compress] = {
+      originFile[compressEncoding] = {
         contents: buf,
         length: buf.length,
-        md5: crypto.createHash('md5').update(buf).digest('base64')
+        md5: crypto.createHash('md5').update(buf).digest(md5Encoding)
       };
-      return new File(originFile, compress);
-    })(callback);
+      checkLRU(originFile.path, originFile[compressEncoding].length);
+      return new File(originFile, compressEncoding);
+    })(done);
   });
 }

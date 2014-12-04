@@ -1,6 +1,6 @@
-file-cache v0.1.2 [![Build Status](https://travis-ci.org/toajs/file-cache.svg)](https://travis-ci.org/toajs/file-cache)
+file-cache v0.2.0 [![Build Status](https://travis-ci.org/toajs/file-cache.svg)](https://travis-ci.org/toajs/file-cache)
 ====
-A file buffer caching module that cache files on demand, rely on thunks.
+Read file with caching, rely on thunks.
 
 ## [thunks](https://github.com/thunks/thunks)
 
@@ -90,16 +90,28 @@ Extra files path, that allow to read.
 
 Allow to compress file with `gzip` or `deflate`
 
+**options.md5Encoding**
+
+*Optional*, Type: `String`, Default: `base64`.
+
+The MD5 encoding can be 'hex', 'binary' or 'base64'.
+
+**options.maxCacheLength**
+
+*Optional*, Type: `Number`, Default: `0`.
+
+The maximum length of the files cache in bytes. if cache's size > maxCacheLength, then the least recently used file will be removed. if maxCacheLength === -1, cache will not be used. if maxCacheLength === 0, there is no limit.
+
 ### fileCache(path, encodings)
 
 #### path
 
 *Required*, Type: `String`
 
-file path to read.
+File path to read.
 
 #### encodings
 
 *Optional*, Type: `String` or `Array`
 
-Accept-Encoding, `['gzip', 'deflate']`
+Compress encoding, `['gzip', 'deflate']`.

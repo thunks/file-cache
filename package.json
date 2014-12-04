@@ -1,10 +1,10 @@
 {
   "name": "file-cache",
-  "description": "A file buffer caching module that cache files on demand, rely on thunks.",
+  "description": "Read file with caching, rely on thunks.",
   "authors": [
     "Yan Qing <admin@zensh.com>"
   ],
-  "version": "0.1.2",
+  "version": "0.2.0",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -22,9 +22,10 @@
     "gzip"
   ],
   "dependencies": {
-    "thunks": "^2.3.0",
-    "mime-types": "~2.0.1",
-    "compressible": "~2.0.0"
+    "compressible": "^2.0.0",
+    "lrucache": "^0.2.0",
+    "mime-types": "^2.0.1",
+    "thunks": "^2.3.0"
   },
   "devDependencies": {
     "gulp": ">=3.8.0",
