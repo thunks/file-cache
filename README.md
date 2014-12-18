@@ -1,4 +1,4 @@
-file-cache v0.2.0 [![Build Status](https://travis-ci.org/toajs/file-cache.svg)](https://travis-ci.org/toajs/file-cache)
+file-cache v0.3.0 [![Build Status](https://travis-ci.org/thunks/file-cache.svg)](https://travis-ci.org/thunks/file-cache)
 ====
 Read file with caching, rely on thunks.
 
@@ -102,7 +102,15 @@ The MD5 encoding can be 'hex', 'binary' or 'base64'.
 
 The maximum length of the files cache in bytes. if cache's size > maxCacheLength, then the least recently used file will be removed. if maxCacheLength === -1, cache will not be used. if maxCacheLength === 0, there is no limit.
 
+**options.minCompressLength**
+
+*Optional*, Type: `Number`, Default: `256`.
+
+The minimum length of the files size in bytes that could be compressed.
+
 ### fileCache(path, encodings)
+
+Return thunk function.
 
 #### path
 

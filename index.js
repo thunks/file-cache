@@ -14,17 +14,17 @@ var compressible = require('compressible');
 var LRUCache = require('lrucache');
 var Thunk = require('thunks')();
 
-var stat = Thunk.thunkify.call(fs, fs.stat);
-var readFile = Thunk.thunkify.call(fs, fs.readFile);
+var stat = Thunk.thunkify(fs.stat);
+var readFile = Thunk.thunkify(fs.readFile);
 var compressFile = {
-  gzip: Thunk.thunkify.call(zlib, zlib.gzip),
-  deflate: Thunk.thunkify.call(zlib, zlib.deflate),
-  origin: function (buf) {
+  gzip: Thunk.thunkify(zlib.gzip),
+  deflate: Thunk.thunkify(zlib.deflate),
+  origin: function(buf) {
     return Thunk(buf);
   }
 };
 
-module.exports = function (options) {
+module.exports = function(options) {
   var cache = Object.create(null);
   var extraFilesMap = Object.create(null);
   var lruCache = new LRUCache();
@@ -36,7 +36,9 @@ module.exports = function (options) {
   // for test.
   if (options.debug) module.exports.cache = cache;
 
-  if (typeof options === 'string') options = {root: options};
+  if (typeof options === 'string') options = {
+    root: options
+  };
 
   var root = typeof options.root === 'string' ? options.root : cwd;
   root = path.resolve(cwd, root);
@@ -48,14 +50,13 @@ module.exports = function (options) {
 
   var enableCompress = options.compress !== false;
   var maxCacheLength = options.maxCacheLength >= -1 ? Math.floor(options.maxCacheLength) : 0;
+  var minCompressLength = options.minCompressLength >= 16 ? Math.floor(options.minCompressLength) : 256;
   var md5Encoding = options.md5Encoding || 'base64';
 
   function resolvePath(filePath) {
     filePath = path.normalize(safeDecodeURIComponent(filePath));
     if (extraFilesMap[filePath]) return extraFilesMap[filePath];
-    filePath = path.resolve(root, filePath);
-    if (filePath.indexOf(root) === 0) return filePath;
-    throw new Error('Unauthorized file path');
+    return path.join(root, filePath);
   }
 
   function checkLRU(filePath, addSize) {
@@ -72,14 +73,14 @@ module.exports = function (options) {
   }
 
   return function fileCache(filePath, encodings) {
-    return Thunk(function (done) {
+    return Thunk(function(done) {
       var compressEncoding = bestCompress(encodings);
       filePath = resolvePath(filePath);
 
       if (cache[filePath]) return cloneFile(cache[filePath], compressEncoding, md5Encoding, checkLRU)(done);
-      return Thunk.seq([stat(filePath), readFile(filePath)])(function (error, res) {
+      return Thunk.seq([stat(filePath), readFile(filePath)])(function(error, res) {
         if (error) throw error;
-        var originFile = new OriginFile(filePath, res[0], res[1], enableCompress);
+        var originFile = new OriginFile(filePath, res[0], res[1], enableCompress, minCompressLength);
         if (maxCacheLength !== -1) cache[filePath] = originFile;
         return cloneFile(originFile, compressEncoding, md5Encoding, checkLRU);
       })(done);
@@ -125,7 +126,7 @@ function File(originFile, compressEncoding) {
   content.contents.copy(this.contents);
 }
 
-function OriginFile(filePath, stats, buf, enableCompress) {
+function OriginFile(filePath, stats, buf, enableCompress, minCompressLength) {
   filePath = filePath.replace(/\\/g, '/');
   this.dir = path.dirname(filePath);
   this.ext = path.extname(filePath);
@@ -136,7 +137,7 @@ function OriginFile(filePath, stats, buf, enableCompress) {
   this.atime = stats.atime.toUTCString();
   this.mtime = stats.mtime.toUTCString();
   this.ctime = stats.ctime.toUTCString();
-  this.compressible = enableCompress && this.size > 256  && compressible(this.type);
+  this.compressible = enableCompress && this.size > minCompressLength && compressible(this.type);
   this.contents = buf;
   this.origin = null;
   this.gzip = null;
@@ -146,9 +147,9 @@ function OriginFile(filePath, stats, buf, enableCompress) {
 function cloneFile(originFile, compressEncoding, md5Encoding, checkLRU) {
   if (!originFile.compressible) compressEncoding = 'origin';
 
-  return Thunk(function (done) {
+  return Thunk(function(done) {
     if (originFile[compressEncoding]) return done(null, new File(originFile, compressEncoding));
-    return compressFile[compressEncoding](originFile.contents)(function (error, buf) {
+    return compressFile[compressEncoding](originFile.contents)(function(error, buf) {
       if (error) throw error;
       originFile[compressEncoding] = {
         contents: buf,

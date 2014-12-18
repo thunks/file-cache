@@ -1,8 +1,7 @@
 'use strict';
 /*global describe, it, before, after, beforeEach, afterEach*/
 
-var should = require('should'),
-  FileCache = require('../index.js');
+var FileCache = require('../index.js');
 
 describe('file-cache', function () {
   var fileCache = FileCache();

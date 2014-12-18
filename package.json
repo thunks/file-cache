@@ -4,13 +4,16 @@
   "authors": [
     "Yan Qing <admin@zensh.com>"
   ],
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:toajs/file-cache.git"
+    "url": "git@github.com:thunks/file-cache.git"
   },
-  "homepage": "https://github.com/toajs/file-cache",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "homepage": "https://github.com/thunks/file-cache",
   "keywords": [
     "thunks",
     "thunk-module",
@@ -32,8 +35,7 @@
     "gulp-jshint": ">=1.8.4",
     "gulp-mocha": ">=1.0.0",
     "gulp-sequence": ">=0.3.0",
-    "mocha": ">=1.21.0",
-    "should": ">=4.0.4"
+    "mocha": ">=1.21.0"
   },
   "scripts": {
     "test": "gulp test"
