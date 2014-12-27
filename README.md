@@ -1,6 +1,9 @@
-file-cache v0.3.0 [![Build Status](https://travis-ci.org/thunks/file-cache.svg)](https://travis-ci.org/thunks/file-cache)
+file-cache
 ====
 Read file with caching, rely on thunks.
+
+[![NPM version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
 
 ## [thunks](https://github.com/thunks/thunks)
 
@@ -123,3 +126,9 @@ File path to read.
 *Optional*, Type: `String` or `Array`
 
 Compress encoding, `['gzip', 'deflate']`.
+
+[npm-url]: https://npmjs.org/package/file-cache
+[npm-image]: http://img.shields.io/npm/v/file-cache.svg
+
+[travis-url]: https://travis-ci.org/thunks/file-cache
+[travis-image]: http://img.shields.io/travis/thunks/file-cache.svg

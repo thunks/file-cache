@@ -4,7 +4,7 @@
   "authors": [
     "Yan Qing <admin@zensh.com>"
   ],
-  "version": "0.3.0",
+  "version": "0.3.1",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -25,10 +25,10 @@
     "gzip"
   ],
   "dependencies": {
-    "compressible": "^2.0.0",
+    "compressible": "^2.0.1",
     "lrucache": "^0.2.0",
-    "mime-types": "^2.0.1",
-    "thunks": "^2.3.0"
+    "mime-types": "^2.0.4",
+    "thunks": "^2.6.0"
   },
   "devDependencies": {
     "gulp": ">=3.8.0",

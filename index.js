@@ -54,9 +54,9 @@ module.exports = function(options) {
   var md5Encoding = options.md5Encoding || 'base64';
 
   function resolvePath(filePath) {
-    filePath = path.normalize(safeDecodeURIComponent(filePath));
+    filePath = path.normalize(filePath);
     if (extraFilesMap[filePath]) return extraFilesMap[filePath];
-    return path.join(root, filePath);
+    return path.join(root, path.join('/', filePath));
   }
 
   function checkLRU(filePath, addSize) {
@@ -98,14 +98,6 @@ function bestCompress(encodings) {
     if (enableEncodings[encodings[i]]) return encodings[i];
   }
   return 'origin';
-}
-
-function safeDecodeURIComponent(path) {
-  try {
-    return decodeURIComponent(path);
-  } catch (e) {
-    return path;
-  }
 }
 
 function File(originFile, compressEncoding) {
