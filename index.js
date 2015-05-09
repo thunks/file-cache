@@ -1,5 +1,5 @@
 'use strict';
-// **Github:** https://github.com/toajs/file-cache
+// **Github:** https://github.com/thunks/file-cache
 //
 // **License:** MIT
 
