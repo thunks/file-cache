@@ -12,15 +12,15 @@ var crypto = require('crypto');
 var mime = require('mime-types');
 var compressible = require('compressible');
 var LRUCache = require('lrucache');
-var Thunk = require('thunks')();
+var thunk = require('thunks')();
 
-var stat = Thunk.thunkify(fs.stat);
-var readFile = Thunk.thunkify(fs.readFile);
+var stat = thunk.thunkify(fs.stat);
+var readFile = thunk.thunkify(fs.readFile);
 var compressFile = {
-  gzip: Thunk.thunkify(zlib.gzip),
-  deflate: Thunk.thunkify(zlib.deflate),
+  gzip: thunk.thunkify(zlib.gzip),
+  deflate: thunk.thunkify(zlib.deflate),
   origin: function(buf) {
-    return Thunk(buf);
+    return thunk(buf);
   }
 };
 
@@ -73,12 +73,12 @@ module.exports = function(options) {
   }
 
   return function fileCache(filePath, encodings) {
-    return Thunk(function(done) {
+    return thunk(function(done) {
       var compressEncoding = bestCompress(encodings);
       filePath = resolvePath(filePath);
 
       if (cache[filePath]) return cloneFile(cache[filePath], compressEncoding, md5Encoding, checkLRU)(done);
-      return Thunk.seq([stat(filePath), readFile(filePath)])(function(error, res) {
+      return thunk.seq([stat(filePath), readFile(filePath)])(function(error, res) {
         if (error) throw error;
         var originFile = new OriginFile(filePath, res[0], res[1], enableCompress, minCompressLength);
         if (maxCacheLength !== -1) cache[filePath] = originFile;
@@ -139,7 +139,7 @@ function OriginFile(filePath, stats, buf, enableCompress, minCompressLength) {
 function cloneFile(originFile, compressEncoding, md5Encoding, checkLRU) {
   if (!originFile.compressible) compressEncoding = 'origin';
 
-  return Thunk(function(done) {
+  return thunk(function(done) {
     if (originFile[compressEncoding]) return done(null, new File(originFile, compressEncoding));
     return compressFile[compressEncoding](originFile.contents)(function(error, buf) {
       if (error) throw error;
