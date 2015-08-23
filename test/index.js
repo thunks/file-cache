@@ -1,14 +1,14 @@
-'use strict';
-/*global describe, it, before, after, beforeEach, afterEach*/
+'use strict'
+/*global describe, it */
 
-var FileCache = require('../index.js');
+var FileCache = require('../index.js')
 
 describe('file-cache', function () {
-  var fileCache = FileCache();
+  var fileCache = FileCache()
   it('file-cache', function (done) {
     fileCache('index.js')(function (err, file) {
-      console.log(err, file);
-    })(done);
-  });
-  // TODO
-});
+      console.log(err, file)
+    })(done)
+  })
+// TODO
+})

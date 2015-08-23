@@ -1,13 +1,13 @@
-'use strict';
+'use strict'
 // **Github:** https://github.com/toajs/file-cache
 //
 // **License:** MIT
 
-var FileCache = require('../index');
-var fileCache = FileCache('./');
+var FileCache = require('../index')
+var fileCache = FileCache('./')
 
 fileCache('index.js')(function (err, file) {
-  console.log(file);
+  console.log(err, file)
   // { path: '/Users/zensh/git/toajs/file-cache/index.js',
   // dir: '/Users/zensh/git/toajs/file-cache',
   // name: 'index.js',
@@ -24,22 +24,22 @@ fileCache('index.js')(function (err, file) {
   // md5: '08f89d75eec2731ea6612ada474a1795' }
 
   fileCache('index.js', 'gzip')(function (err, file) {
-    console.log(file);
-    // read file from cache, compress with gzip:
-    //
-    // { path: '/Users/zensh/git/toajs/file-cache/index.js',
-    // dir: '/Users/zensh/git/toajs/file-cache',
-    // name: 'index.js',
-    // ext: '.js',
-    // type: 'application/javascript',
-    // size: 4375,
-    // atime: 'Sun, 30 Nov 2014 03:48:47 GMT',
-    // mtime: 'Sun, 30 Nov 2014 03:48:35 GMT',
-    // ctime: 'Sun, 30 Nov 2014 03:48:35 GMT',
-    // birthtime: 'Tue, 23 Sep 2014 01:13:26 GMT',
-    // compress: 'gzip',
-    // contents: <Buffer 1f 8b 08 00 00 00 00 00 00 03 95 58 4b 73 db 36 10 be eb 57 30 97 90 74 64 ca e9 34 17 a9 69 a7 75 d3 36 33 c9 a4 d3 26 27 47 07 8a 04 45 24 14 c1 00 ... >,
-    // length: 2576,
-    // md5: '33a6f550613d64dc6b7e1e2d99d568bd' }
-  });
-});
+    console.log(err, file)
+  // read file from cache, compress with gzip:
+  //
+  // { path: '/Users/zensh/git/toajs/file-cache/index.js',
+  // dir: '/Users/zensh/git/toajs/file-cache',
+  // name: 'index.js',
+  // ext: '.js',
+  // type: 'application/javascript',
+  // size: 4375,
+  // atime: 'Sun, 30 Nov 2014 03:48:47 GMT',
+  // mtime: 'Sun, 30 Nov 2014 03:48:35 GMT',
+  // ctime: 'Sun, 30 Nov 2014 03:48:35 GMT',
+  // birthtime: 'Tue, 23 Sep 2014 01:13:26 GMT',
+  // compress: 'gzip',
+  // contents: <Buffer 1f 8b 08 00 00 00 00 00 00 03 95 58 4b 73 db 36 10 be eb 57 30 97 90 74 64 ca e9 34 17 a9 69 a7 75 d3 36 33 c9 a4 d3 26 27 47 07 8a 04 45 24 14 c1 00 ... >,
+  // length: 2576,
+  // md5: '33a6f550613d64dc6b7e1e2d99d568bd' }
+  })
+})
