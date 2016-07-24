@@ -1,21 +1,21 @@
 file-cache
 ====
-Read file with caching, rely on thunks.
+Read file with LRU caching, rely on thunks.
 
 [![NPM version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
+[![Downloads][downloads-image]][downloads-url]
 
 ## [thunks](https://github.com/thunks/thunks)
 
 ## Demo
 
 ```js
-'use strict';
-var FileCache = require('file-cache');
-var fileCache = FileCache('./');
+var FileCache = require('file-cache')
+var fileCache = FileCache('./')
 
 fileCache('index.js')(function (err, file) {
-  console.log(file);
+  console.log(err, file)
   // { path: '/Users/zensh/git/toajs/file-cache/index.js',
   // dir: '/Users/zensh/git/toajs/file-cache',
   // name: 'index.js',
@@ -32,7 +32,7 @@ fileCache('index.js')(function (err, file) {
   // md5: '08f89d75eec2731ea6612ada474a1795' }
 
   fileCache('index.js', 'gzip')(function (err, file) {
-    console.log(file);
+    console.log(err, file)
     // read file from cache, compress with gzip:
     //
     // { path: '/Users/zensh/git/toajs/file-cache/index.js',
@@ -49,11 +49,11 @@ fileCache('index.js')(function (err, file) {
     // contents: <Buffer 1f 8b 08 00 00 00 00 00 00 03 95 58 4b 73 db 36 10 be eb 57 30 97 90 74 64 ca e9 34 17 a9 69 a7 75 d3 36 33 c9 a4 d3 26 27 47 07 8a 04 45 24 14 c1 00 ... >,
     // length: 2576,
     // md5: '33a6f550613d64dc6b7e1e2d99d568bd' }
-  });
-});
+  })
+})
 ```
 
-## Installation
+## Install
 
 ```bash
 npm install file-cache
@@ -62,8 +62,8 @@ npm install file-cache
 ## API
 
 ```js
-var FileCache = require('file-cache');
-var fileCache = FileCache('./static');
+var FileCache = require('file-cache')
+var fileCache = FileCache('./static')
 ```
 
 ### FileCache(options)
@@ -83,7 +83,7 @@ File directory, that allow to read file.
 
 **options.extraFiles**
 
-*Optional*, Type: `String` or `Array`, Default: `[]`.
+*Optional*, Type: `Array<String>`, Default: `[]`.
 
 Extra files path, that allow to read.
 
@@ -132,3 +132,6 @@ Compress encoding, `['gzip', 'deflate']`.
 
 [travis-url]: https://travis-ci.org/thunks/file-cache
 [travis-image]: http://img.shields.io/travis/thunks/file-cache.svg
+
+[downloads-url]: https://npmjs.org/package/file-cache
+[downloads-image]: http://img.shields.io/npm/dm/file-cache.svg?style=flat-square
