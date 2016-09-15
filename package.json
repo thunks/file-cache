@@ -4,7 +4,7 @@
   "authors": [
     "Yan Qing <admin@zensh.com>"
   ],
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -28,11 +28,11 @@
     "compressible": "^2.0.8",
     "lrucache": "^1.0.2",
     "mime-types": "^2.1.11",
-    "thunks": "^4.4.2"
+    "thunks": "^4.7.1"
   },
   "devDependencies": {
-    "standard": "^7.1.2",
-    "tman": "^1.0.4"
+    "standard": "^8.0.0",
+    "tman": "^1.4.5"
   },
   "scripts": {
     "test": "standard && tman"
