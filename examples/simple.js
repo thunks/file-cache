@@ -3,8 +3,8 @@
 //
 // **License:** MIT
 
-var FileCache = require('../index')
-var fileCache = FileCache('./')
+const FileCache = require('../index')
+const fileCache = FileCache('./')
 
 fileCache('index.js')(function (err, file) {
   console.log(err, file)

@@ -4,14 +4,14 @@
   "authors": [
     "Yan Qing <admin@zensh.com>"
   ],
-  "version": "1.0.2",
+  "version": "1.1.0",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:thunks/file-cache.git"
   },
   "engines": {
-    "node": ">=0.12"
+    "node": ">= 4.5.0"
   },
   "homepage": "https://github.com/thunks/file-cache",
   "keywords": [
@@ -25,14 +25,14 @@
     "gzip"
   ],
   "dependencies": {
-    "compressible": "^2.0.8",
+    "compressible": "^2.0.10",
     "lrucache": "^1.0.2",
-    "mime-types": "^2.1.12",
-    "thunks": "^4.7.5"
+    "mime-types": "^2.1.15",
+    "thunks": "^4.8.0"
   },
   "devDependencies": {
-    "standard": "^8.3.0",
-    "tman": "^1.6.0"
+    "standard": "^10.0.2",
+    "tman": "^1.6.9"
   },
   "scripts": {
     "test": "standard && tman"

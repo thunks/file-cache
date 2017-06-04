@@ -1,13 +1,13 @@
 'use strict'
 
-var path = require('path')
-var tman = require('tman')
-var assert = require('assert')
-var thunk = require('thunks')()
-var FileCache = require('../index.js')
+const path = require('path')
+const tman = require('tman')
+const assert = require('assert')
+const thunk = require('thunks')()
+const FileCache = require('../index.js')
 
 tman.suite('file-cache', function () {
-  var fileCache = FileCache({debug: true})
+  const fileCache = FileCache({debug: true})
 
   tman.it('read dir should error', function () {
     return fileCache('test')(function (err, res) {
@@ -46,7 +46,7 @@ tman.suite('file-cache', function () {
       assert.strictEqual(file.contents.length, file.size)
       assert.strictEqual(typeof file.md5, 'string')
 
-      var originFile = FileCache.cache[file.path]
+      let originFile = FileCache.cache[file.path]
       assert.ok(originFile instanceof FileCache.OriginFile)
       assert.strictEqual(originFile.md5, file.md5)
       assert.strictEqual(originFile.count, 1)
@@ -68,7 +68,7 @@ tman.suite('file-cache', function () {
       assert.ok(file.contents.length < file.size)
       assert.strictEqual(typeof file.md5, 'string')
 
-      var originFile = FileCache.cache[file.path]
+      let originFile = FileCache.cache[file.path]
       assert.strictEqual(originFile.md5, file.md5)
       assert.strictEqual(originFile.count, 2)
       assert.strictEqual(originFile.deflate, null)
@@ -88,7 +88,7 @@ tman.suite('file-cache', function () {
       assert.ok(file.contents.length < file.size)
       assert.strictEqual(typeof file.md5, 'string')
 
-      var originFile = FileCache.cache[file.path]
+      let originFile = FileCache.cache[file.path]
       assert.strictEqual(originFile.md5, file.md5)
       assert.strictEqual(originFile.count, 3)
       assert.ok(originFile.deflate.length < originFile.origin.length)
@@ -119,7 +119,7 @@ tman.suite('file-cache', function () {
       assert.deepEqual(res[0], res[1])
       assert.deepEqual(res[2], res[3])
 
-      var originFile = FileCache.cache[res[0].path]
+      let originFile = FileCache.cache[res[0].path]
       assert.strictEqual(originFile.count, 5)
       assert.ok(Buffer.isBuffer(originFile.origin))
       assert.ok(Buffer.isBuffer(originFile.gzip))

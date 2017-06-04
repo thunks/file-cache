@@ -3,20 +3,19 @@
 //
 // **License:** MIT
 
-var fs = require('fs')
-var zlib = require('zlib')
-var path = require('path')
-var crypto = require('crypto')
+const fs = require('fs')
+const zlib = require('zlib')
+const path = require('path')
+const crypto = require('crypto')
 
-var mime = require('mime-types')
-var compressible = require('compressible')
-var LRUCache = require('lrucache')
-var thunk = require('thunks')()
+const mime = require('mime-types')
+const compressible = require('compressible')
+const LRUCache = require('lrucache')
+const thunk = require('thunks')()
 
-var stat = thunk.thunkify(fs.stat)
-var readFile = thunk.thunkify(fs.readFile)
-var copyBuffer = Buffer.allocUnsafe ? Buffer.from : function (buf) { return new Buffer(buf) }
-var compressFile = {
+const stat = thunk.thunkify(fs.stat)
+const readFile = thunk.thunkify(fs.readFile)
+const compressFile = {
   gzip: thunk.thunkify(zlib.gzip),
   deflate: thunk.thunkify(zlib.deflate),
   origin: function (buf) {
@@ -25,11 +24,11 @@ var compressFile = {
 }
 
 module.exports = function (options) {
-  var cache = Object.create(null)
-  var extraFilesMap = Object.create(null)
-  var lruCache = new LRUCache()
-  var totalBytes = 0
-  var cwd = process.cwd()
+  const cache = Object.create(null)
+  const extraFilesMap = Object.create(null)
+  const lruCache = new LRUCache()
+  const cwd = process.cwd()
+  let totalBytes = 0
 
   options = options || {}
 
@@ -37,19 +36,19 @@ module.exports = function (options) {
   // for test.
   if (options.debug) module.exports.cache = cache
 
-  var root = typeof options.root === 'string' ? options.root : cwd
+  let root = typeof options.root === 'string' ? options.root : cwd
   root = path.resolve(cwd, root)
 
-  var extraFiles = options.extraFiles || []
+  const extraFiles = options.extraFiles || []
   if (!Array.isArray(extraFiles)) throw new Error('"extraFiles" must be Array')
-  for (var i = 0; i < extraFiles.length; i++) {
+  for (let i = 0; i < extraFiles.length; i++) {
     extraFilesMap[extraFiles[i]] = path.resolve(cwd, extraFiles[i])
   }
 
-  var enableCompress = options.compress !== false
-  var maxCacheLength = options.maxCacheLength >= -1 ? Math.floor(options.maxCacheLength) : 0
-  var minCompressLength = options.minCompressLength >= 16 ? Math.floor(options.minCompressLength) : 256
-  var md5Encoding = options.md5Encoding || 'base64'
+  const enableCompress = options.compress !== false
+  const maxCacheLength = options.maxCacheLength >= -1 ? Math.floor(options.maxCacheLength) : 0
+  const minCompressLength = options.minCompressLength >= 16 ? Math.floor(options.minCompressLength) : 256
+  const md5Encoding = options.md5Encoding || 'base64'
 
   function resolvePath (filePath) {
     filePath = path.normalize(filePath)
@@ -64,7 +63,7 @@ module.exports = function (options) {
     lruCache.set(filePath, (lruCache.get(filePath) || 0) + addSize)
 
     while (lruCache.staleKey() !== filePath && totalBytes >= maxCacheLength) {
-      var stale = lruCache.popStale()
+      let stale = lruCache.popStale()
       delete cache[stale[0]]
       totalBytes -= stale[1]
     }
@@ -72,10 +71,10 @@ module.exports = function (options) {
 
   return function fileCache (filePath, encodings) {
     return thunk(function (done) {
-      var compressEncoding = bestCompress(encodings)
+      let compressEncoding = bestCompress(encodings)
       filePath = resolvePath(filePath)
 
-      var readAndCacheFile = cache[filePath]
+      let readAndCacheFile = cache[filePath]
       if (readAndCacheFile instanceof OriginFile) {
         return cloneFile(readAndCacheFile, compressEncoding, checkLRU)(done)
       }
@@ -89,7 +88,7 @@ module.exports = function (options) {
 
       readAndCacheFile(function (error, res) {
         if (error) throw error
-        var originFile = cache[filePath]
+        let originFile = cache[filePath]
         if (!(originFile instanceof OriginFile)) {
           originFile = new OriginFile(filePath, res[0], res[1],
             enableCompress, minCompressLength, md5Encoding)
@@ -101,13 +100,13 @@ module.exports = function (options) {
   }
 }
 
-var enableEncodings = Object.create(null)
+const enableEncodings = Object.create(null)
 enableEncodings.gzip = true
 enableEncodings.deflate = true
 
 function bestCompress (encodings) {
   if (!Array.isArray(encodings)) encodings = [encodings]
-  for (var i = 0; i < encodings.length; i++) {
+  for (let i = 0; i < encodings.length; i++) {
     if (enableEncodings[encodings[i]]) return encodings[i]
   }
   return 'origin'
@@ -125,7 +124,7 @@ function File (originFile, compressEncoding) {
   this.mtime = originFile.mtime
   this.ctime = originFile.ctime
   this.compress = compressEncoding === 'origin' ? '' : compressEncoding
-  this.contents = copyBuffer(originFile[compressEncoding])
+  this.contents = Buffer.from(originFile[compressEncoding])
 }
 
 function OriginFile (filePath, stats, buf, enableCompress, minCompressLength, md5Encoding) {
@@ -152,7 +151,7 @@ function cloneFile (originFile, compressEncoding, checkLRU) {
   return thunk(function (done) {
     originFile.count += 1
     if (!originFile.compressible) compressEncoding = 'origin'
-    var compressAndCacheBuffer = originFile[compressEncoding]
+    let compressAndCacheBuffer = originFile[compressEncoding]
     if (Buffer.isBuffer(compressAndCacheBuffer)) {
       return done(null, new File(originFile, compressEncoding))
     }

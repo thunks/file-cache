@@ -1,5 +1,5 @@
-file-cache
-====
+# file-cache
+
 Read file with LRU caching, rely on thunks.
 
 [![NPM version][npm-image]][npm-url]
@@ -11,8 +11,8 @@ Read file with LRU caching, rely on thunks.
 ## Demo
 
 ```js
-var FileCache = require('file-cache')
-var fileCache = FileCache('./')
+const FileCache = require('file-cache')
+const fileCache = FileCache('./')
 
 fileCache('index.js')(function (err, file) {
   console.log(err, file)
@@ -62,8 +62,8 @@ npm install file-cache
 ## API
 
 ```js
-var FileCache = require('file-cache')
-var fileCache = FileCache('./static')
+const FileCache = require('file-cache')
+const fileCache = FileCache('./static')
 ```
 
 ### FileCache(options)
